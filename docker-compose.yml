@@ -29,6 +29,20 @@ services:
       - prometheus
     restart: unless-stopped
 
+  k6:
+    image: grafana/k6:0.55.0
+    container_name: k6
+    profiles: ["tools"]
+    volumes:
+      - ./scripts:/scripts
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write
+      - K6_PROMETHEUS_RW_TREND_STATS=p(95),p(99),min,max,avg
+      - K6_OUT=experimental-prometheus-rw
+      - BASE_URL=${BASE_URL:-https://petstore.octoperf.com}
+    depends_on:
+      - prometheus
+
 volumes:
   prometheus_data:
   grafana_data:
