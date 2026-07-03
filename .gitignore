@@ -1,0 +1,23 @@
+# =================================================================
+# .gitignore — fichiers ignorés par Git
+# =================================================================
+
+# --- Variables d'environnement contenant des secrets ---
+.env
+.env.local
+.env.*.local
+
+# --- Système macOS ---
+.DS_Store
+
+# --- Éditeur VS Code ---
+.vscode/
+*.code-workspace
+
+# --- Sauvegardes accidentelles ---
+*.bak
+*.backup
+*~
+
+# --- Logs éventuels ---
+*.log
