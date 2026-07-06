@@ -189,6 +189,4 @@ Docker Desktop n'est pas lancé. Le lancer via Spotlight (`Cmd+Espace` → "Dock
 - **Prometheus Remote Write** — https://prometheus.io/docs/specs/remote_write_spec/
 - **Grafana Dashboard k6** — https://grafana.com/grafana/dashboards/19665
 
----
 
-*Stack construite pas à pas avec un focus sur la compréhension de chaque composant.*
