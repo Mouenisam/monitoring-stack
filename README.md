@@ -7,21 +7,18 @@ Cette stack permet de tester la performance de **n'importe quelle plateforme web
 ---
 
 ## Vue d'ensemble
-
-`​``
 ┌─────────┐   requêtes HTTP    ┌──────────────┐
 │   k6    │───────────────────>│ Application  │
 │(charge) │   (simule users)   │   testée     │
 └────┬────┘                    └──────────────┘
-     │
-     │ push métriques
-     │ (Remote Write)
-     ▼
+│
+│ push métriques
+│ (Remote Write)
+▼
 ┌──────────────┐   requêtes    ┌─────────────┐
 │  Prometheus  │<──────────────│   Grafana   │
 │    (TSDB)    │    PromQL     │ (dashboards)│
 └──────────────┘               └─────────────┘
-`​``
 
 - **k6** — générateur de charge open-source par Grafana Labs (scripts JavaScript)
 - **Prometheus** — collecte et stockage des métriques via Remote Write
@@ -37,16 +34,16 @@ Cette stack permet de tester la performance de **n'importe quelle plateforme web
 
 Vérification des versions :
 
-`​``bash
+```bash
 docker --version         # 24.x ou supérieur
 docker compose version   # v2.x ou supérieur
-`​``
+```
 
 ---
 
 ## Démarrage rapide
 
-`​``bash
+```bash
 # 1. Cloner le repository
 git clone https://github.com/Mouenisam/monitoring-stack.git
 cd monitoring-stack
@@ -63,13 +60,11 @@ docker compose run --rm k6 run /scripts/smoke-test.js
 
 # 5. Consulter les résultats
 # → http://localhost:3000 (Grafana, admin / admin)
-`​``
+```
 
 ---
 
 ## Structure du projet
-
-`​``
 monitoring-stack/
 ├── docker-compose.yml           # Orchestration des 3 services
 ├── .env.example                 # Template de configuration
@@ -87,10 +82,9 @@ monitoring-stack/
 │           └── k6.json          # Dashboard k6 officiel (ID 19665)
 │
 └── scripts/
-    ├── smoke-test.js            # Validation rapide (2 users, 30s)
-    ├── load-test.js             # Charge réaliste (montée à 20 users, 9 min)
-    └── stress-test.js           # Point de rupture (jusqu'à 200 users, 11 min)
-`​``
+├── smoke-test.js            # Validation rapide (2 users, 30s)
+├── load-test.js             # Charge réaliste (montée à 20 users, 9 min)
+└── stress-test.js           # Point de rupture (jusqu'à 200 users, 11 min)
 
 ---
 
@@ -106,7 +100,7 @@ monitoring-stack/
 
 ### Lancer un test
 
-`​``bash
+```bash
 # Smoke test
 docker compose run --rm k6 run /scripts/smoke-test.js
 
@@ -115,14 +109,11 @@ docker compose run --rm k6 run /scripts/load-test.js
 
 # Stress test (ATTENTION : uniquement sur environnement dédié)
 docker compose run --rm k6 run /scripts/stress-test.js
-`​``
+```
 
 ### Interrompre un test en cours
 
-`​``bash
-# Ctrl+C dans le terminal où tourne k6
-# k6 termine proprement les VUs en cours et sort le résumé
-`​``
+Faire `Ctrl+C` dans le terminal où tourne k6. k6 termine proprement les VUs en cours et sort le résumé.
 
 ---
 
@@ -132,28 +123,28 @@ docker compose run --rm k6 run /scripts/stress-test.js
 
 Toute la configuration est dans le fichier `.env`. Il suffit de modifier `BASE_URL` :
 
-`​``bash
+```bash
 # Dans .env
 BASE_URL=https://ta-plateforme.com
-`​``
+```
 
 Puis relancer la stack :
 
-`​``bash
+```bash
 docker compose up -d
-`​``
+```
 
 ### Créer un scénario pour ta propre plateforme
 
 Copie un script existant et adapte les endpoints :
 
-`​``bash
+```bash
 cp scripts/smoke-test.js scripts/mon-test.js
-`​``
+```
 
 Dans `mon-test.js`, remplace les URLs par tes propres endpoints, par exemple :
 
-`​``javascript
+```javascript
 export default function () {
   const response = http.get(`${BASE_URL}/api/v1/produits`);
   check(response, {
@@ -161,13 +152,13 @@ export default function () {
   });
   sleep(1);
 }
-`​``
+```
 
 Puis lance :
 
-`​``bash
+```bash
 docker compose run --rm k6 run /scripts/mon-test.js
-`​``
+```
 
 ### Variables d'environnement disponibles
 
@@ -205,7 +196,7 @@ Astuce : en haut à droite du dashboard, régler la plage temporelle sur **"Last
 
 ## Commandes utiles
 
-`​``bash
+```bash
 # État de la stack
 docker compose ps
 
@@ -224,7 +215,7 @@ docker compose down -v
 
 # Vérifier la config résolue
 docker compose config
-`​``
+```
 
 ---
 
@@ -232,25 +223,25 @@ docker compose config
 
 ### Grafana ne se lance pas
 
-`​``bash
+```bash
 docker compose logs grafana --tail 30
-`​``
+```
 
-Cas fréquent : le fichier `datasource.yml` ou `dashboards.yml` est vide (0 octets). Vérifier avec `ls -la` et re-créer avec la syntaxe `cat > fichier << 'EOF' ... EOF`.
+Cas fréquent : le fichier `datasource.yml` ou `dashboards.yml` est vide (0 octets). Vérifier avec `ls -la` et re-créer avec la syntaxe `cat > fichier << EOF ... EOF`.
 
 ### k6 échoue à envoyer les métriques à Prometheus
 
 Vérifier que Prometheus a bien été démarré avec le flag Remote Write :
 
-`​``bash
+```bash
 docker compose logs prometheus | grep "remote"
-`​``
+```
 
 Si le flag est absent, forcer la recréation :
 
-`​``bash
+```bash
 docker compose up -d --force-recreate prometheus
-`​``
+```
 
 ### Le dashboard Grafana est vide malgré un test réussi
 
@@ -264,11 +255,11 @@ Docker Desktop n'est pas lancé. Le lancer via Spotlight (`Cmd+Espace` → "Dock
 
 C'est une erreur critique de sécurité. Vérifier le `.gitignore` puis :
 
-`​``bash
+```bash
 git rm --cached .env
 git commit -m "Remove .env from tracking"
 git push
-`​``
+```
 
 ---
 
@@ -303,4 +294,6 @@ git push
 
 Projet à usage interne / démonstration.
 
+---
 
+*Stack construite pas à pas avec un focus sur la compréhension de chaque composant.*
